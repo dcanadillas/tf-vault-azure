@@ -1,0 +1,17 @@
+cluster_name = "sd-poc-cluster"
+resource_group = "sd-poc-rg-vault"
+region = "westeurope" 
+size = "Standard_D4_v3"
+owner = "sdigital"
+numnodes = 3
+arm_client_secret ="000000000-0000-0000-0000-000000000000"
+az_image = "Ubuntu-Vault-1_4_2Ent"
+image_resource = "myimgs-rg"
+vmpassword = "MyStr0ngS3cr3t"
+enable_tls = "true"
+common_name= "example.com"
+domains = "vault.example.com"
+cert = [""]
+ca_cert = ""
+cert_key = [""]
+own_certs = false

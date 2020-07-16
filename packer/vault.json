@@ -1,0 +1,48 @@
+{
+    "variables": {
+      "client_id": "{{env `ARM_CLIENT_ID`}}",
+      "client_secret": "{{env `ARM_CLIENT_SECRET`}}",
+      "subscription_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
+      "ssh_user": "packer",
+      "ssh_pass": "{{env `ARM_SSH_PASS`}}"
+    },
+    "builders": [{
+      "type": "azure-arm",
+      "build_resource_group_name": "{{user `resource_group`}}",
+  
+      "client_id": "{{user `client_id`}}",
+      "client_secret": "{{user `client_secret`}}",
+
+      "subscription_id": "{{user `subscription_id`}}",
+  
+      "managed_image_resource_group_name": "{{user `resource_group`}}",
+      "managed_image_name": "Ubuntu-Vault-{{user `version`}}",
+  
+      "ssh_username": "{{user `ssh_user`}}",
+      "ssh_password": "{{user `ssh_pass`}}",
+  
+      "os_type": "Linux",
+      "image_publisher": "Canonical",
+      "image_offer": "UbuntuServer",
+      "image_sku": "18.04-LTS",
+      "ssh_pty": "true",
+  
+      "vm_size": "Standard_DS2_v2"
+    }],
+    "provisioners": [
+      {
+          "type": "shell",
+          "execute_command": "chmod +x {{ .Path }}; sudo '{{ .Path }}' {{ user `vault_version` }}",
+          "script": "vault.sh"
+      },
+      {
+        "execute_command": "echo '{{user `ssh_pass`}}' | {{ .Vars }} sudo -S -E sh '{{ .Path }}'",
+        "inline": [
+            "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+        ],
+        "inline_shebang": "/bin/sh -x",
+        "skip_clean": true,
+        "type": "shell"
+      }
+    ]
+  }
