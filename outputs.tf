@@ -11,5 +11,5 @@ output "TLS" {
 #   value = module.azure.bastion
 # }
 output "vault_ca" {
-    value = module.tls-cert.vault_ca
+    value = var.own_certs ? var.ca_cert : module.tls-cert.vault_ca
 }

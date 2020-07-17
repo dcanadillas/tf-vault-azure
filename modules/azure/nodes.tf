@@ -99,13 +99,17 @@ resource "azurerm_virtual_machine" "vault-vm" {
       me_ca         = var.ca_cert,
       me_cert       = element(var.vault_cert,count.index),
       me_key        = element(var.vault_key,count.index),
-      http = var.tls ==  true ? "https" : "http",
+      http = var.tls ==  "true" ? "https" : "http",
       vault_servers    = var.nodes
     }) 
   }
 
   os_profile_linux_config {
     disable_password_authentication = false
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 
   # lifecycle {
@@ -135,36 +139,36 @@ resource "azurerm_network_interface_backend_address_pool_association" "vault" {
 
 # ------- Template file for Vault installation -----
 # # DEPRECATED
-data "template_file" "server" {
-  # depends_on = [azurerm_public_ip.servers-pip]
-  count      = var.nodes
+# data "template_file" "server" {
+#   # depends_on = [azurerm_public_ip.servers-pip]
+#   count      = var.nodes
 
-  template = "${file("${path.module}/templates/vault.tpl")}"
+#   template = "${file("${path.module}/templates/vault.tpl")}"
 
-  vars = {
-    clustername = var.cluster
-    location      = var.az_region
-    #hostname      = azurerm_virtual_machine.vault-vm[count.index].os_profile.computer_name
-    private_ip    = azurerm_network_interface.vault-dc-nic[count.index].private_ip_address
-    public_ip     = azurerm_public_ip.public-ip[count.index].ip_address
-    # enterprise    = var.enterprise
-    # vaultlicense  = var.vaultlicense
-    kmsvaultname  = azurerm_key_vault.dc-vault.name
-    kmskeyname    = azurerm_key_vault_key.dc-vault.name
-    # subscription_id = var.subscription_id
-    tenant_id     = data.azurerm_client_config.current.tenant_id
-    # client_id     = azurerm_user_assigned_identity.dc-vault.client_id
-    client_id     = data.azurerm_client_config.current.client_id
-    client_secret = var.client_secret
-    # object_id     = azurerm_user_assigned_identity.dc-vault.principal_id
-    object_id     = data.azurerm_client_config.current.object_id
-    # fqdn          = azurerm_public_ip.servers-pip[count.index].fqdn
-    node_name     = "vault-server-${count.index}"
-    tls_disable = var.tls == "true" ? 0 : 1
-    me_ca         = var.ca_cert
-    me_cert       = var.vault_cert[count.index]
-    me_key        = var.vault_key[count.index]
-    vault_servers    = var.nodes
- }
-}
+#   vars = {
+#     clustername = var.cluster
+#     location      = var.az_region
+#     #hostname      = azurerm_virtual_machine.vault-vm[count.index].os_profile.computer_name
+#     private_ip    = azurerm_network_interface.vault-dc-nic[count.index].private_ip_address
+#     public_ip     = azurerm_public_ip.public-ip[count.index].ip_address
+#     # enterprise    = var.enterprise
+#     # vaultlicense  = var.vaultlicense
+#     kmsvaultname  = azurerm_key_vault.dc-vault.name
+#     kmskeyname    = azurerm_key_vault_key.dc-vault.name
+#     # subscription_id = var.subscription_id
+#     tenant_id     = data.azurerm_client_config.current.tenant_id
+#     # client_id     = azurerm_user_assigned_identity.dc-vault.client_id
+#     client_id     = data.azurerm_client_config.current.client_id
+#     client_secret = var.client_secret
+#     # object_id     = azurerm_user_assigned_identity.dc-vault.principal_id
+#     object_id     = data.azurerm_client_config.current.object_id
+#     # fqdn          = azurerm_public_ip.servers-pip[count.index].fqdn
+#     node_name     = "vault-server-${count.index}"
+#     tls_disable = var.tls == "true" ? 0 : 1
+#     me_ca         = var.ca_cert
+#     me_cert       = var.vault_cert[count.index]
+#     me_key        = var.vault_key[count.index]
+#     vault_servers    = var.nodes
+#  }
+# }
 

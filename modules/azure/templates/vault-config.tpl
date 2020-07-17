@@ -38,7 +38,7 @@ if [ -d "$VAULT_DIR" ]; then
 %{ for leader_host in hosts ~}
 %{ if node_name != leader_host ~}
         retry_join {
-            leader_api_addr = "http://${leader_host}:8200"
+            leader_api_addr = "${http}://${leader_host}:8200"
             # leader_ca_cer_file = "/path/to/ca1"
             # leader_client_cert_file = "/etc/vault.d/tls/vault.crt"
             # leader_client_key_file = "/etc/ssl/certs/me.key"
